@@ -55,10 +55,8 @@ export const Route = createFileRoute("/api/hooks/mail")({
   },
 });
 
-type Sql = (strings: TemplateStringsArray, ...values: unknown[]) => Promise<never>;
-
 /** Deep-scan the payload for any @-address that is a configured desk mailbox. */
-async function findAddress(sql: Sql, payload: unknown): Promise<string> {
+async function findAddress(sql: import("@/lib/db").Sql, payload: unknown): Promise<string> {
   const rows = await sql<{ address: string }>`
     select lower(address) as address from mailbox
   `;
