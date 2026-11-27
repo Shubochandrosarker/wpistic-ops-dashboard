@@ -42,24 +42,30 @@ function InboxDesk({ connected }: { connected: boolean }) {
 
   useEffect(() => {
     let cancel = false;
-    void listMailFn()
-      .then((rows) => {
-        if (!cancel) setMail(rows);
-      })
-      .catch((loadError: unknown) => {
-        if (!cancel) setError(loadError instanceof Error ? loadError.message : "Mail did not load");
-      });
-    if (connected) {
-      void listChatsFn()
+    async function loadAll() {
+      void listMailFn()
         .then((rows) => {
-          if (!cancel) setChats(rows);
+          if (!cancel) setMail(rows);
         })
         .catch((loadError: unknown) => {
-          if (!cancel) setError(loadError instanceof Error ? loadError.message : "AnyChat did not load");
+          if (!cancel) setError(loadError instanceof Error ? loadError.message : "Mail did not load");
         });
+      if (connected) {
+        void listChatsFn()
+          .then((rows) => {
+            if (!cancel) setChats(rows);
+          })
+          .catch((loadError: unknown) => {
+            if (!cancel) setError(loadError instanceof Error ? loadError.message : "AnyChat did not load");
+          });
+      }
     }
+    void loadAll();
+    // Hostinger webhooks push mail into the DB; poll so new items surface fast.
+    const timer = setInterval(() => void loadAll(), 20000);
     return () => {
       cancel = true;
+      clearInterval(timer);
     };
   }, [connected]);
 

@@ -284,6 +284,45 @@ export async function syncMailbox(userId: string, id: string): Promise<{ count: 
   return { count: messages.length };
 }
 
+/**
+ * Webhook-driven sync: pull one mailbox's inbox into `mail_message` without a
+ * user session. Used by /api/hooks/mail (Hostinger message.received push), so
+ * the desk sees new mail seconds after it lands instead of on next page load.
+ */
+export async function syncMailboxByAddress(address: string): Promise<{ count: number; deskId: string }> {
+  const sql = await getSql();
+  const rows = await sql<MailboxRow>`
+    select id, desk_id, label, address,
+      imap_host as "imapHost", imap_port as "imapPort",
+      smtp_host as "smtpHost", smtp_port as "smtpPort",
+      username, secret
+    from mailbox
+    where lower(address) = lower(${address})
+    limit 1
+  `;
+  const box = rows[0];
+  if (!box) throw new Error(`No desk mailbox is configured for ${address}`);
+  const messages = await readInbox(connection(box));
+  for (const message of messages) {
+    const messageId = `${box.id}:${message.uid}`;
+    await sql`
+      insert into mail_message (
+        id, desk_id, mailbox_id, uid, from_name, from_addr, subject, snippet, body, at
+      ) values (
+        ${messageId}, ${box.desk_id}, ${box.id}, ${message.uid}, ${message.fromName},
+        ${message.fromAddr}, ${message.subject}, ${message.snippet}, ${message.body}, ${message.at}
+      )
+      on conflict (mailbox_id, uid) do update
+      set subject = excluded.subject,
+          snippet = excluded.snippet,
+          body = excluded.body,
+          from_name = excluded.from_name,
+          from_addr = excluded.from_addr
+    `;
+  }
+  return { count: messages.length, deskId: box.desk_id };
+}
+
 export async function listMail(userId: string): Promise<MailCard[]> {
   const desk = await requireDesk(userId);
   const sql = await getSql();
