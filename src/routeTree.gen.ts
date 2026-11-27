@@ -19,6 +19,7 @@ import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as TrafficRouteImport } from './routes/traffic'
 import { Route as WhatsappRouteImport } from './routes/whatsapp'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiHooksMailRouteImport } from './routes/api/hooks/mail'
 import { Route as ApiTelnyxWebhookRouteImport } from './routes/api/telnyx/webhook'
 
 const IndexRoute = IndexRouteImport.update({
@@ -71,6 +72,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiHooksMailRoute = ApiHooksMailRouteImport.update({
+  id: '/api/hooks/mail',
+  path: '/api/hooks/mail',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiTelnyxWebhookRoute = ApiTelnyxWebhookRouteImport.update({
   id: '/api/telnyx/webhook',
   path: '/api/telnyx/webhook',
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/traffic': typeof TrafficRoute
   '/whatsapp': typeof WhatsappRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/hooks/mail': typeof ApiHooksMailRoute
   '/api/telnyx/webhook': typeof ApiTelnyxWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/traffic': typeof TrafficRoute
   '/whatsapp': typeof WhatsappRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/hooks/mail': typeof ApiHooksMailRoute
   '/api/telnyx/webhook': typeof ApiTelnyxWebhookRoute
 }
 export interface FileRoutesById {
@@ -115,6 +123,7 @@ export interface FileRoutesById {
   '/traffic': typeof TrafficRoute
   '/whatsapp': typeof WhatsappRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/hooks/mail': typeof ApiHooksMailRoute
   '/api/telnyx/webhook': typeof ApiTelnyxWebhookRoute
 }
 export interface FileRouteTypes {
@@ -130,6 +139,7 @@ export interface FileRouteTypes {
     | '/traffic'
     | '/whatsapp'
     | '/api/auth/$'
+    | '/api/hooks/mail'
     | '/api/telnyx/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -143,6 +153,7 @@ export interface FileRouteTypes {
     | '/traffic'
     | '/whatsapp'
     | '/api/auth/$'
+    | '/api/hooks/mail'
     | '/api/telnyx/webhook'
   id:
     | '__root__'
@@ -156,6 +167,7 @@ export interface FileRouteTypes {
     | '/traffic'
     | '/whatsapp'
     | '/api/auth/$'
+    | '/api/hooks/mail'
     | '/api/telnyx/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -170,6 +182,7 @@ export interface RootRouteChildren {
   TrafficRoute: typeof TrafficRoute
   WhatsappRoute: typeof WhatsappRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiHooksMailRoute: typeof ApiHooksMailRoute
   ApiTelnyxWebhookRoute: typeof ApiTelnyxWebhookRoute
 }
 
@@ -245,6 +258,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/hooks/mail': {
+      id: '/api/hooks/mail'
+      path: '/api/hooks/mail'
+      fullPath: '/api/hooks/mail'
+      preLoaderRoute: typeof ApiHooksMailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/telnyx/webhook': {
       id: '/api/telnyx/webhook'
       path: '/api/telnyx/webhook'
@@ -266,6 +286,7 @@ const rootRouteChildren: RootRouteChildren = {
   TrafficRoute: TrafficRoute,
   WhatsappRoute: WhatsappRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiHooksMailRoute: ApiHooksMailRoute,
   ApiTelnyxWebhookRoute: ApiTelnyxWebhookRoute,
 }
 export const routeTree = rootRouteImport
